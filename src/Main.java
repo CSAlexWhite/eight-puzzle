@@ -3,6 +3,9 @@ import java.util.Hashtable;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class Main {
 	
 	static final String GOAL = 	"123804765";
@@ -10,7 +13,7 @@ public class Main {
 	static final String EASY = 	"134862705";
 	static final String MEDIUM = "281043765";
 	static final String HARD = 	"281463075";
-	static final String WORST = "567408123";
+	static final String WORST = "567408321";
 	
 	static final int[][] ADJACENCE = new int[][]{
 			
@@ -69,11 +72,18 @@ public class Main {
 		
 		int expanded = 0;
 		int maxmoves = 0;
+		
 		while(!success){
 		
-			current = openList.remove();		// GET THE BEST STATE FROM THE QUEUE
+			current = openList.poll();	// GET THE BEST STATE FROM THE QUEUE
 			
-			if(current.cost > maxmoves) System.out.println((maxmoves = current.cost) + "\t" + expanded);
+			if(current.cost > maxmoves){ 
+				
+				System.out.print((maxmoves = current.cost) + "\t");
+				printTime();
+				System.out.println("\t" + expanded + "\t" + openList.size() + "\t");
+			}
+			
 			if(current.equals(goalState)){ 
 				
 				success = true; 
@@ -81,41 +91,40 @@ public class Main {
 				
 				printMoves(current); break;	
 			}
-			
-			else {
-								
-				closedList.put(current.key, current);
-				expanded++;
-				for(int move=0; move<current.availableMoves; move++){
+										
+			closedList.put(current.key, current);
+			expanded++;
+			for(int move=0; move<current.availableMoves; move++){
+				
+				neighbor = new State(current, current.moveableCoords[move]);
+				
+				if(closedList.containsKey(neighbor.key) 
+						&& neighbor.cost < closedList.get(neighbor.key).cost){		// IF WE'VE ALREADY SEEN THIS STATE
+																									// AND IT'S PATH IS COSTLIER THAN THAT
+					openList.add(neighbor);	
+					openTable.put(neighbor.key, neighbor);
+														// OF THE CURRENT NODE, OPEN UP THE NEIGHBOR
+					closedList.remove(neighbor.key);	// AND TAKE IT OFF THE CLOSED LIST						
+				}
+				
+				else if(openTable.containsKey(neighbor.key) 
+						&& neighbor.cost < openTable.get(neighbor.key).cost){
 					
-					neighbor = new State(current, current.moveableCoords[move]);
+					openTable.remove(neighbor.key);
+					openList.remove(neighbor);
 					
-					if(closedList.containsKey(neighbor.key) && neighbor.cost < closedList.get(neighbor.key).cost){		// IF WE'VE ALREADY SEEN THIS STATE
-																										// AND IT'S PATH IS COSTLIER THAN THAT
-						openList.add(neighbor);	
-						openTable.put(neighbor.key, neighbor);
-															// OF THE CURRENT NODE, OPEN UP THE NEIGHBOR
-						closedList.remove(neighbor.key);	// AND TAKE IT OFF THE CLOSED LIST
-						//neighbor.print(false);						
-					}
+					openList.add(neighbor);
+				}
+				
+				else { 
 					
-					else if(openTable.containsKey(neighbor.key) && neighbor.cost < openTable.get(neighbor.key).cost){ // TODO get the cost of the neighbor that's already in the queue
-						
-						openTable.remove(neighbor.key);
-						if(openList.remove(neighbor)) System.out.println("HOORAH!");
-						
-						openList.add(neighbor);
-					}
-					
-					else { 
-						
-						openList.add(neighbor); 
-						openTable.put(neighbor.key, neighbor);
-					}
-				}			
-			}		
-		}
+					openList.add(neighbor); 
+					openTable.put(neighbor.key, neighbor);
+				}
+			}			
+		}		
 	}
+
 	
 	public static void dF_BnB(){
 	
@@ -187,5 +196,13 @@ public class Main {
 			
 			stateList.elementAt(i).print();
 		}
+	}
+	
+	public static void printTime(){
+		
+		Calendar cal = Calendar.getInstance();
+    	cal.getTime();
+    	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+    	System.out.print( sdf.format(cal.getTime()) );
 	}
 }
