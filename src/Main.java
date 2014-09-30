@@ -60,7 +60,7 @@ public class Main {
 		Boolean success = false;
 		int iterations = 0;
 		openList = new PriorityQueue<State>(10, heuristic);
-		openList.add(new State(HARD));
+		openList.add(new State(WORST));
 		
 		closedList = new Hashtable<String, State>();
 		openTable = new Hashtable<String, State>();
@@ -101,8 +101,8 @@ public class Main {
 					
 					else if(openTable.containsKey(neighbor.key) && neighbor.cost < openTable.get(neighbor.key).cost){ // TODO get the cost of the neighbor that's already in the queue
 						
-						openList.remove(neighbor);
 						openTable.remove(neighbor.key);
+						if(openList.remove(neighbor)) System.out.println("HOORAH!");
 						
 						openList.add(neighbor);
 					}
