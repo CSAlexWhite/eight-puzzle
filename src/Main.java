@@ -60,7 +60,7 @@ public class Main {
 		Boolean success = false;
 		int iterations = 0;
 		openList = new PriorityQueue<State>(10, heuristic);
-		openList.add(new State(EASY));
+		openList.add(new State(HARD));
 		
 		closedList = new Hashtable<String, State>();
 		openTable = new Hashtable<String, State>();
