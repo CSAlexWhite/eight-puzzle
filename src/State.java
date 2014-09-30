@@ -1,4 +1,6 @@
-public class State {
+import java.util.Arrays;
+
+public class State extends Object{
 							// SOME POINTERS TO IMPORTANT OBJECTS:
 	State parent;			// THE PARENT
 	State goal;				// THE GOAL
@@ -42,6 +44,8 @@ public class State {
 		else moveableCoords = new int[availableMoves = 2];					// EXPANSIONS
 		
 		assignMoveable();
+		misplaced = 0;
+		manhattan = 0;
 	}
 
 	/**
@@ -144,18 +148,62 @@ public class State {
 		for(int i=0; i<9; i++) stringCode += board[i];
 		return stringCode;
 	}
-
-	/**
-	 * A test to determine whether two States are equivalent
-	 * @param input
-	 * @return
-	 */
-	public Boolean equals(State input){
+	
+	public String toString(){
 		
-		for(int i=0; i<9; i++) if (board[i] != input.board[i]) return false;
+		return key;
+	}
+
+//	/**
+//	 * A test to determine whether two States are equivalent
+//	 * @param input
+//	 * @return
+//	 */
+//	@Override
+//	public boolean equals(Object input){
+//		
+//		if(input.key == key) return true;
+//		return false;
+//	}
+	
+//	@Override
+//	public boolean equals(Object other){
+//	    if (other == null) return false;
+//	    if (other == this) return true;
+//	    else return false;
+//	    //if (!(other instanceof State))return false;
+////	    MyClass otherMyClass = (MyClass)other;
+////	    ...test other properties here...
+//	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(board);
+		result = prime * result + ((key == null) ? 0 : key.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		State other = (State) obj;
+		if (!Arrays.equals(board, other.board))
+			return false;
+		if (key == null) {
+			if (other.key != null)
+				return false;
+		} else if (!key.equals(other.key))
+			return false;
 		return true;
 	}
-	
+
 	/**
 	 * Print the board to console, in the board orientation
 	 */

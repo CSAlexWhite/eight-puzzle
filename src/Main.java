@@ -3,6 +3,9 @@ import java.util.Hashtable;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class Main {
 	
 	static final String GOAL = 	"123804765";
@@ -10,6 +13,7 @@ public class Main {
 	static final String EASY = 	"134862705";
 	static final String MEDIUM = "281043765";
 	static final String HARD = 	"281463075";
+	static final String HARDER = "231463705";
 	static final String WORST = "567408123";
 	
 	static final int[][] ADJACENCE = new int[][]{
@@ -50,17 +54,41 @@ public class Main {
 			
 		initialize();
 		
+		//test();
+		
 		//A_Star(misplaced);
 		A_Star(manhattan);
 		//dF_BnB();
 	}
+	
+	public static void test(){
+		
+		openList = new PriorityQueue<State>(10, manhattan);
+		openList.add(new State(EASY));
+		openList.add(new State(MEDIUM));
+		openList.add(new State(HARD));
+		openList.add(new State(WORST));
+		openList.add(new State(GOAL));
+		
+		State hello = new State(EASY);
+		State goodbye = new State(EASY);
+		State whatsup = new State(HARD);
+		
+		if(hello.equals(whatsup)) System.out.println("OKAY");
+		else System.out.println("FUCKED");
+		
+		if(openList.contains(GOAL)) System.out.println("CONTAINED");
+		if(openList.remove(GOAL)) System.out.println("REMOVED");
+		
+		while(!openList.isEmpty()) openList.remove().print();
+	}
 
 	private static void A_Star(Comparator<State> heuristic) { 
 		
-		Boolean success = false;
+		boolean success = false;
 		int iterations = 0;
 		openList = new PriorityQueue<State>(10, heuristic);
-		openList.add(new State(EASY));
+		openList.add(new State(WORST));
 		
 		closedList = new Hashtable<String, State>();
 		openTable = new Hashtable<String, State>();
@@ -71,9 +99,14 @@ public class Main {
 		int maxmoves = 0;
 		while(!success){
 		
-			current = openList.remove();		// GET THE BEST STATE FROM THE QUEUE
+			current = openList.poll();		// GET THE BEST STATE FROM THE QUEUE
 			
-			if(current.cost > maxmoves) System.out.println((maxmoves = current.cost) + "\t" + expanded);
+			if(current.cost > maxmoves){ 
+				printTime();
+				System.out.println("\t" + (maxmoves = current.cost) + "\t" + expanded + "\t");
+				System.out.println(openList.size());
+			}
+			
 			if(current.equals(goalState)){ 
 				
 				success = true; 
@@ -82,39 +115,38 @@ public class Main {
 				printMoves(current); break;	
 			}
 			
-			else {
-								
-				closedList.put(current.key, current);
-				expanded++;
-				for(int move=0; move<current.availableMoves; move++){
+			openList.size();
+			
+			closedList.put(current.key, current);
+			expanded++;
+			for(int move=0; move<current.availableMoves; move++){
+				
+				neighbor = new State(current, current.moveableCoords[move]);
+				
+				if(closedList.containsKey(neighbor.key) 
+						&& neighbor.cost < closedList.get(neighbor.key).cost){		// IF WE'VE ALREADY SEEN THIS STATE
+																									// AND IT'S PATH IS COSTLIER THAN THAT
+					openList.add(neighbor);	
+					openTable.put(neighbor.key, neighbor);
+														// OF THE CURRENT NODE, OPEN UP THE NEIGHBOR
+					closedList.remove(neighbor.key);	// AND TAKE IT OFF THE CLOSED LIST					
+				}
+				
+				else if(openTable.containsKey(neighbor.key) 
+						&& neighbor.cost < openTable.get(neighbor.key).cost){ // TODO get the cost of the neighbor that's already in the queue
+					System.out.println("SHOULD REMOVE");
+					if(openList.remove(neighbor)) System.out.println("REMOVED");					
+					openTable.remove(neighbor.key);					
+					openList.add(neighbor);
+				}
+				
+				else { 
 					
-					neighbor = new State(current, current.moveableCoords[move]);
-					
-					if(closedList.containsKey(neighbor.key) && neighbor.cost < closedList.get(neighbor.key).cost){		// IF WE'VE ALREADY SEEN THIS STATE
-																										// AND IT'S PATH IS COSTLIER THAN THAT
-						openList.add(neighbor);	
-						openTable.put(neighbor.key, neighbor);
-															// OF THE CURRENT NODE, OPEN UP THE NEIGHBOR
-						closedList.remove(neighbor.key);	// AND TAKE IT OFF THE CLOSED LIST
-						//neighbor.print(false);						
-					}
-					
-					else if(openTable.containsKey(neighbor.key) && neighbor.cost < openTable.get(neighbor.key).cost){ // TODO get the cost of the neighbor that's already in the queue
-						
-						openList.remove(neighbor);
-						openTable.remove(neighbor.key);
-						
-						openList.add(neighbor);
-					}
-					
-					else { 
-						
-						openList.add(neighbor); 
-						openTable.put(neighbor.key, neighbor);
-					}
-				}			
-			}		
-		}
+					openList.add(neighbor); 
+					openTable.put(neighbor.key, neighbor);
+				}
+			}			
+		}		
 	}
 	
 	public static void dF_BnB(){
@@ -167,11 +199,19 @@ public class Main {
 		
 	}
 	
-	public static void initialize(){
+	private static void initialize(){
 		
 		stateList = new Vector<State>(0);
 		misplaced = new MisplacedComparator();
 		manhattan = new ManhattanComparator();	
+	}
+	
+	public static void printTime(){
+	
+		Calendar cal = Calendar.getInstance();
+		cal.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		System.out.print( sdf.format(cal.getTime()) );
 	}
 	
 	public static void printMoves(State current){
