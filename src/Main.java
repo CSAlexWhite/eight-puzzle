@@ -9,7 +9,8 @@ import java.util.Calendar;
 public class Main {
 	
 	static final String GOAL = 	"123804765";
-	static final String TEST = 	"724506831";
+	//static final String GOAL = 	"012345678";
+	static final String TEST = 	"724506381";
 	static final String EASY = 	"134862705";
 	static final String MEDIUM = "281043765";
 	static final String HARD = 	"281463075";
@@ -49,13 +50,19 @@ public class Main {
 	static MisplacedComparator misplaced;
 	static ManhattanComparator manhattan;	
 	
+	static long startTime, endTime;
+	
 	public static void main(String[] args) {
 			
 		initialize();
+		startTime = System.currentTimeMillis();
 		
-		//A_Star(misplaced);
-		A_Star(manhattan);
-		//dF_BnB();
+		A_Star(misplaced);
+		//A_Star(manhattan);
+		//dF_BnB(startTime);
+		
+		endTime = System.currentTimeMillis();
+		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
 	}
 
 	private static void A_Star(Comparator<State> heuristic) { 
@@ -63,7 +70,7 @@ public class Main {
 		Boolean success = false;
 		int iterations = 0;
 		openList = new PriorityQueue<State>(10, heuristic);
-		openList.add(new State(WORST));
+		openList.add(new State(TEST));
 		
 		closedList = new Hashtable<String, State>();
 		openTable = new Hashtable<String, State>();
@@ -89,7 +96,7 @@ public class Main {
 				success = true; 
 				System.out.println("SUCCESS!!");
 				
-				printMoves(current); break;	
+				printMoves(current, true); break;	
 			}
 										
 			closedList.put(current.key, current);
@@ -126,12 +133,14 @@ public class Main {
 	}
 
 	
-	public static void dF_BnB(){
+	public static void/*long*/ dF_BnB(long startTime){
 	
+		Vector<State> optimalSolution = new Vector<State>(0);
+		long optimalTime = 0;
 		openList = new PriorityQueue<State>(10, manhattan);
 		closedList = new Hashtable<String, State>();
 		
-		State start = new State(HARD);	// CREATE FIRST STATE
+		State start = new State(WORST);	// CREATE FIRST STATE
 		int bestScore = Integer.MAX_VALUE;
 		int tempScore = 0;
 		
@@ -144,10 +153,12 @@ public class Main {
 			current = openList.remove();
 			if(current.equals(goalState)){
 				
+				long endTime = System.currentTimeMillis();
 				tempScore = current.cost;
 				if(tempScore < bestScore) bestScore = tempScore;
-
-				printMoves(current); break;
+				System.out.println("Solution Time: " + (endTime - startTime) + "ms\tMoves: " + current.cost);
+				optimalSolution = printMoves(current, false); 
+				optimalTime = endTime - startTime;//break;
 			}
 			
 			else {
@@ -156,24 +167,44 @@ public class Main {
 					
 					neighbor = new State(current, current.moveableCoords[move]);
 					
-					if(closedList.contains(neighbor)) continue;
-					if(neighbor.manhattan() > bestScore){
-						
+					if(closedList.containsKey(neighbor.key)) continue;
+					if((neighbor.cost + neighbor.manhattan) > bestScore){
 						closedList.put(neighbor.key, neighbor);
 						continue;
 					}
 					
 					openList.add(neighbor);
 				}
-			}		
+			}
 		}
 		
-		System.out.println("DONE");
+		System.out.println("Optimal Time: " + (optimalTime) + "ms");
+		for(int i=optimalSolution.size()-1; i>=0; i--)
+				optimalSolution.elementAt(i).print();	
 	}
 	
 	public static void idA_Star(){
 		
+		State start = new State(HARD);
 		
+		int iterations = 0;
+		openList = new PriorityQueue<State>(10, manhattan);
+		openList.add(new State(TEST));
+		
+		closedList = new Hashtable<String, State>();
+		openTable = new Hashtable<String, State>();
+			
+		State current = null, neighbor = null;
+		
+		int expanded = 0;
+		int maxmoves = 0;
+		
+		int f = start.manhattan;
+			
+		while(true){
+			
+			
+		}	
 	}
 	
 	public static void initialize(){
@@ -183,7 +214,7 @@ public class Main {
 		manhattan = new ManhattanComparator();	
 	}
 	
-	public static void printMoves(State current){
+	public static Vector<State> printMoves(State current, boolean print){
 		
 		stateList.add(current);
 		while(current.parent != null){
@@ -192,10 +223,12 @@ public class Main {
 			stateList.add(current);		
 		}
 		
-		for(int i=stateList.size()-1; i>=0; i--){
-			
-			stateList.elementAt(i).print();
+		if(print){
+			for(int i=stateList.size()-1; i>=0; i--)
+				stateList.elementAt(i).print();	
 		}
+		
+		return stateList;
 	}
 	
 	public static void printTime(){

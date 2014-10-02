@@ -110,7 +110,7 @@ public class State {
 	public int misplaced(){
 		
 		int count = 0;
-		for(int i=0; i<9; i++) if(board[i] != 0 && board[i] != goal.board[i]) count++;
+		for(int i=0; i<9; i++) if(board[i] != 0 && (board[i] != goal.board[i])) count++;
 		return count;
 	}
 	
