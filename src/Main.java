@@ -57,9 +57,19 @@ public class Main {
 		initialize();
 		startTime = System.currentTimeMillis();
 		
-		A_Star(misplaced);
-		//A_Star(manhattan);
-		//dF_BnB(startTime);
+		//A_Star(misplaced);
+		
+		endTime = System.currentTimeMillis();
+		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
+		A_Star(manhattan);
+		
+		endTime = System.currentTimeMillis();
+		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
+		dF_BnB(startTime);
+		
+		endTime = System.currentTimeMillis();
+		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
+		idA_Star();
 		
 		endTime = System.currentTimeMillis();
 		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
@@ -70,7 +80,7 @@ public class Main {
 		Boolean success = false;
 		int iterations = 0;
 		openList = new PriorityQueue<State>(10, heuristic);
-		openList.add(new State(TEST));
+		openList.add(new State(WORST));
 		
 		closedList = new Hashtable<String, State>();
 		openTable = new Hashtable<String, State>();
@@ -185,26 +195,39 @@ public class Main {
 	
 	public static void idA_Star(){
 		
-		State start = new State(HARD);
-		
-		int iterations = 0;
 		openList = new PriorityQueue<State>(10, manhattan);
-		openList.add(new State(TEST));
 		
-		closedList = new Hashtable<String, State>();
-		openTable = new Hashtable<String, State>();
-			
-		State current = null, neighbor = null;
+		State start = new State(WORST), current = null, neighbor = null;
 		
-		int expanded = 0;
-		int maxmoves = 0;
+		openList.add(start);
 		
-		int f = start.manhattan;
-			
+		int f = start.manhattan + start.cost;
+		
 		while(true){
 			
-			
+			current = openList.remove();	// GET THE BEST STATE FROM THE QUEUE
+						
+			if(current.equals(goalState)){ 
+				
+				System.out.println("SUCCESS!!");				
+				printMoves(current, true); break;	
+			}
+		
+			// BRANCH AND BOUND
+			for(int move=0; move<current.availableMoves; move++){
+				
+				neighbor = new State(current, current.moveableCoords[move]);
+				openList.add(neighbor);
+				if((neighbor.cost + neighbor.manhattan) > f){
+
+					continue;
+				}
+				
+				if((neighbor.cost + neighbor.manhattan) < f)
+					f = (neighbor.cost + neighbor.manhattan);												
+			}
 		}	
+		
 	}
 	
 	public static void initialize(){
