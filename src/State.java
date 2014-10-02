@@ -34,8 +34,7 @@ public class State {
 		for(int i=0; i<9; i++) board[i] = Character.getNumericValue(input.charAt(i));
 			
 		key = input;
-		
-			
+				
 		for(int i=0; i<9; i++) if( board[i] == 0 ) empty = i; 				// FIND EMPTY		
 		if(empty == 4) moveableCoords = new int[availableMoves = 4];		// ADD MOVEABLE PIECES
 		else if(empty%2 == 1) moveableCoords = new int[availableMoves = 3];	// AND TRACK POTENTIAL
@@ -62,14 +61,11 @@ public class State {
 		board = new int[9]; for(int i=0; i<9 ; i++) board[i] = last.board[i];
 		
 		empty = last.empty;
-				
-		heuristic = cost + misplaced();
-		
+
 		key = getCode();
 				
 		move(toMove);			// PLUS SWAPPING A MOVEABLE PIECE
-		
-		
+			
 		for(int i=0; i<9; i++) if( board[i] == 0 ) empty = i; 				// FIND EMPTY		
 		if(empty == 4) moveableCoords = new int[availableMoves = 4];		// ADD MOVEABLE PIECES
 		else if(empty%2 == 1) moveableCoords = new int[availableMoves = 3];	// AND TRACK POTENTIAL

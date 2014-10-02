@@ -57,25 +57,18 @@ public class Main {
 		initialize();
 		startTime = System.currentTimeMillis();
 		
+		AStar.run(new State(HARD), new State(GOAL), manhattan);
+		
 		//A_Star(misplaced);
-		
-		endTime = System.currentTimeMillis();
-		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
-		A_Star(manhattan);
-		
-		endTime = System.currentTimeMillis();
-		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
-		dF_BnB(startTime);
-		
-		endTime = System.currentTimeMillis();
-		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
-		idA_Star();
+		//A_Star(manhattan);		
+		//dF_BnB(startTime);		
+		//idA_Star();
 		
 		endTime = System.currentTimeMillis();
 		System.out.println("Computation Time = " + (endTime - startTime) + "ms");
 	}
 
-	private static void A_Star(Comparator<State> heuristic) { 
+	public static void A_Star(Comparator<State> heuristic) { 
 		
 		Boolean success = false;
 		int iterations = 0;
@@ -195,7 +188,7 @@ public class Main {
 	
 	public static void idA_Star(){
 		
-		openList = new PriorityQueue<State>(10, manhattan);
+		openList = new PriorityQueue<State>(10, misplaced);
 		
 		State start = new State(WORST), current = null, neighbor = null;
 		
