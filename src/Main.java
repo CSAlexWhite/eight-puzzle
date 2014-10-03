@@ -17,7 +17,7 @@ public class Main {
 	static final String WORST = "567408321";
 	
 	static final String[] MOVES = new String[]
-		{ "", "right", "down", "left", "up" };
+		{ "", "Right", "Down", "Left", "Up" };
 	
 	static final int[][] ADJACENCE = new int[][]{
 			
@@ -43,7 +43,7 @@ public class Main {
 		{ 3, 2, 3, 2, 1, 2, 1, 0, 1 },
 		{ 4, 3, 2, 3, 2, 1, 2, 1, 0 }};
 	
-	static State goalState = new State(GOAL);
+	static State goalState = new State(GOAL, true);
 	
 	static PriorityQueue<State> openList;
 	static Hashtable <String, State> closedList;
@@ -60,7 +60,7 @@ public class Main {
 		initialize();
 		startTime = System.currentTimeMillis();
 		
-		AStar.run(new State(HARD), new State(GOAL), manhattan);
+		AStar.run(new State(WORST, false), new State(GOAL, true), manhattan);
 		
 		//A_Star(misplaced);
 		//A_Star(manhattan);		
@@ -76,7 +76,7 @@ public class Main {
 		Boolean success = false;
 		int iterations = 0;
 		openList = new PriorityQueue<State>(10, heuristic);
-		openList.add(new State(WORST));
+		openList.add(new State(WORST, false));
 		
 		closedList = new Hashtable<String, State>();
 		openTable = new Hashtable<String, State>();
@@ -146,7 +146,7 @@ public class Main {
 		openList = new PriorityQueue<State>(10, manhattan);
 		closedList = new Hashtable<String, State>();
 		
-		State start = new State(WORST);	// CREATE FIRST STATE
+		State start = new State(WORST, false);	// CREATE FIRST STATE
 		int bestScore = Integer.MAX_VALUE;
 		int tempScore = 0;
 		
@@ -192,7 +192,7 @@ public class Main {
 		
 		openList = new PriorityQueue<State>(10, misplaced);
 		
-		State start = new State(WORST), current = null, neighbor = null;
+		State start = new State(WORST, false), current = null, neighbor = null;
 		
 		openList.add(start);
 		
