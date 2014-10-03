@@ -96,25 +96,24 @@ public class State{
 		
 		while(!stateList.isEmpty()){		// THEN PRINT IT OUT TOP TO BOTTOM
 			current = stateList.pop(); 
-			printBoard(current.cost, current.action);
+			printBoard(current);
 		}
 	}
 	
 	/** Prints the 8-puzzle board in its normal 3x3 layout.
-	 *  @param cost - number of moves to get to this state
-	 *  @param action - what was done to the previous board to get here
+	 *  @param current - the current board
 	 */
-	public void printBoard(int cost, String action){
+	public void printBoard(State current){
 		
-		if(cost != 0) System.out.println(cost + ": Move " + action);
-		else System.out.println(cost + ":" + action);
+		if(cost != 0) System.out.println(current.cost + ": Move " + current.action);
+		else System.out.println(current.cost + ":" + current.action);
 		
 		int k=0;						// PRINTS THE 3X3 BOARD
 		for(int i=0; i<3; i++){			// AND LEAVES AN EMPTY SPACE WHERE
 			for(int j=0; j<3; j++){ 	// IT FINDS A ZERO
 				
-				if(board[k] == 0){ System.out.print("  "); k++;}
-				else System.out.print(board[k++] + " ");	
+				if(current.board[k] == 0){ System.out.print("  "); k++;}
+				else System.out.print(current.board[k++] + " ");	
 			}	System.out.println();		
 		}		System.out.println();	
 	}

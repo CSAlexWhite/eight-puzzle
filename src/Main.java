@@ -1,23 +1,15 @@
-import java.util.Hashtable;
-import java.util.PriorityQueue;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Main {
 	
 	static final String GOAL = 	"123804765";
-	//static final String GOAL = 	"012345678";
-	static final String TEST = 	"724506381";
 	static final String EASY = 	"134862705";
 	static final String MEDIUM = "281043765";
 	static final String HARD = 	"281463075";
 	static final String WORST = "567408321";
 	
-	static State goalState = new State(GOAL, true);	
-	
-	static PriorityQueue<State> openList;
-	static Hashtable <String, State> closedList;
-	static Hashtable <String, State> openTable;
+	static State goalState;
 	
 	static MisplacedComparator misplaced;
 	static ManhattanComparator manhattan;	
@@ -29,8 +21,9 @@ public class Main {
 		initialize();
 		startTime = System.currentTimeMillis();
 		
-		AStar.run(new State(WORST, false), new State(GOAL, true), manhattan);
-		//DFBnB.run(new State(WORST, false), new State(GOAL, true), manhattan, startTime);
+		//AStar.run(new State(WORST, false), new State(GOAL, true), misplaced);
+		//AStar.run(new State(WORST, false), new State(GOAL, true), manhattan);
+		DFBnB.run(new State(WORST, false), new State(GOAL, true), manhattan);
 		//IDAStar.run(new State(WORST, false), new State(GOAL, true), manhattan);
 		
 		endTime = System.currentTimeMillis();
@@ -39,6 +32,7 @@ public class Main {
 	
 	public static void initialize(){
 		
+		goalState = new State(GOAL, true);	
 		misplaced = new MisplacedComparator();
 		manhattan = new ManhattanComparator();	
 	}

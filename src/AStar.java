@@ -6,82 +6,96 @@ import java.util.PriorityQueue;
 
 public abstract class AStar {
 
-	static PriorityQueue<State> openList;
+	static PriorityQueue<State> openQueue;
 	static Hashtable <String, State> closedList;
-	static Hashtable <String, State> openTable;
+	static Hashtable <String, State> openList;
 	
 	public static void run(State start, State goal, Comparator<State> heuristic) { 
 		
-		openList = new PriorityQueue<State>(10, heuristic);			
+		openQueue = new PriorityQueue<State>(10, heuristic);			
 		closedList = new Hashtable<String, State>();
-		openTable = new Hashtable<String, State>();
+		openList = new Hashtable<String, State>();	
+		State current = null, neighbor = null;		
+		int expanded = 0, maxmoves = 0;
 		
-		openList.add(start);
-		State current = null, neighbor = null;
-		
-		int expanded = 0;
-		int maxmoves = 0;
-		
+		openQueue.add(start);
 		while(true){
 		
-			current = openList.poll();	// GET THE BEST STATE FROM THE QUEUE
+			addToClosed(current = openQueue.poll());// GET BEST STATE FROM QUEUE
+			expanded++;								// COUNT IT AS EXPANDED
 			
-			if(current.cost > maxmoves){ 
-				
-				System.out.print((maxmoves = current.cost) + "\t");
-				printTime();
-				System.out.println("\t" + expanded + "\t" + openList.size() + "\t");
+			if(current.cost > maxmoves)	// FOR EVERY NEW DEPTH PRINT AN UPDATE
+				printUpdate(maxmoves = current.cost, expanded, current);		
+			
+			if(current.equals(goal)){ 				// IF A GOAL IS FOUND
+				System.out.println("SUCCESS!!");	// PRINT THE MOVES			
+				current.printMoves(); break;		// AND BOARD CONFIGURATION					
 			}
 			
-			if(current.equals(goal)){ 
-				
-				System.out.println("SUCCESS!!");				
-				current.printMoves(); break;	
-			}
-										
-			closedList.put(current.key, current); expanded++;
+			/*	FOR EACH AVAILABLE MOVE IN THE CURRENT STATE	*/
 			for(int move=0; move<current.availableMoves; move++){
 				
+				/*	CREATE A NEW STATE BASED ON THAT MOVE	*/
 				neighbor = new State(current, current.moveableCoords[move]);
-				
+					
+				/*	IF THERE'S A BETTER DUPLICATE IN THE CLOSED  LIST 	*/
 				if(closedList.containsKey(neighbor.key) 
-						&& neighbor.cost < closedList.get(neighbor.key).cost){		// IF WE'VE ALREADY SEEN THIS STATE
-																					// AND IT'S PATH IS COSTLIER THAN THAT
-					openList.add(neighbor);	
-					openTable.put(neighbor.key, neighbor);
-														// OF THE CURRENT NODE, OPEN UP THE NEIGHBOR
-					closedList.remove(neighbor.key);	// AND TAKE IT OFF THE CLOSED LIST						
+					&& neighbor.cost < closedList.get(neighbor.key).cost){	
+					
+						takeFromClosed(neighbor);	// MOVE THE NEIGHBOR FROM 
+						addToOpen(neighbor);		// CLOSED TO OPEN LIST
+				}		//	NOTE: THIS REPLACES THE OLD NEIGHBOR WITH THE NEW 					
+				
+				/*	IF THERE'S A BETTER DUPLICATE IN THE OPEN LIST	*/
+				else if(openList.containsKey(neighbor.key)
+					&& neighbor.cost < openList.get(neighbor.key).cost){
+					
+						takeFromOpen(neighbor);		// REPLACE THE OLD NEIGHBOR			
+						addToOpen(neighbor);		// WITH ITS CHEAPER TWIN
 				}
 				
-				else if(openTable.containsKey(neighbor.key) 
-						&& neighbor.cost < openTable.get(neighbor.key).cost){
-					
-					openTable.remove(neighbor.key);
-					openList.remove(neighbor);
-					
-					openList.add(neighbor);
-				}
-				
-				else { 
-					
-					openList.add(neighbor); 
-					openTable.put(neighbor.key, neighbor);
-				}
-			}			
+				else  	addToOpen(neighbor);		// ELSE SAVE IT FOR LATER
+			}										// IN ORDER OF ITS SCORE
 		}		
 	}
 	
-	public static void addToOpen(State toAdd){
+	/**************************** PRIVATE METHODS *****************************/
+	
+	private static void addToOpen(State toAdd){
 		
-		openList.add(toAdd);	
-		openTable.put(toAdd.key, toAdd);
+		openQueue.add(toAdd);	
+		openList.put(toAdd.key, toAdd);
 	}
 	
-	public static void printTime(){
+	private static void takeFromOpen(State toTake){
+		
+		openList.remove(toTake.key);
+		openQueue.remove(toTake);
+	}
+	
+	private static void addToClosed(State toAdd){
+		
+		closedList.put(toAdd.key, toAdd);
+	}
+	
+	private static void takeFromClosed(State toTake){
+		
+		closedList.remove(toTake.key);
+	}
+	
+	private static void printTime(){
 		
 		Calendar cal = Calendar.getInstance();
     	cal.getTime();
     	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
     	System.out.print( sdf.format(cal.getTime()) );
+	}
+	
+	private static void printUpdate(int maxmoves, int expanded, State current){
+		
+		if(maxmoves == 1) System.out.println("Depth\tTime\t\tExpanded Nodes");
+		System.out.print((maxmoves = current.cost) + "\t\t");
+		printTime();
+		System.out.println("\t" + expanded + "\t");
 	}
 }
