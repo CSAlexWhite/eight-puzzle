@@ -14,8 +14,6 @@ public abstract class AStar {
 	
 	public static void run(State start, State goal, Comparator<State> heuristic) { 
 		
-		Boolean success = false;
-		int iterations = 0;
 		openList = new PriorityQueue<State>(10, heuristic);
 		openList.add(start);
 		
@@ -27,7 +25,7 @@ public abstract class AStar {
 		int expanded = 0;
 		int maxmoves = 0;
 		
-		while(!success){
+		while(true){
 		
 			current = openList.poll();	// GET THE BEST STATE FROM THE QUEUE
 			
@@ -40,10 +38,8 @@ public abstract class AStar {
 			
 			if(current.equals(goal)){ 
 				
-				success = true; 
-				System.out.println("SUCCESS!!");
-				
-				printMoves(current, true); break;	
+				System.out.println("SUCCESS!!");				
+				current.printMoves(); break;	
 			}
 										
 			closedList.put(current.key, current);
@@ -79,24 +75,6 @@ public abstract class AStar {
 		}		
 	}
 	
-	public static Vector<State> printMoves(State current, boolean print){
-		
-		stateList = new Vector<State>();
-		stateList.add(current);
-		while(current.parent != null){
-			
-			current = current.parent;
-			stateList.add(current);		
-		}
-		
-		if(print){
-			for(int i=stateList.size()-1; i>=0; i--)
-				stateList.elementAt(i).print();	
-		}
-		
-		return stateList;
-	}
-	
 	public static void printTime(){
 		
 		Calendar cal = Calendar.getInstance();
@@ -104,5 +82,4 @@ public abstract class AStar {
     	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
     	System.out.print( sdf.format(cal.getTime()) );
 	}
-	
 }

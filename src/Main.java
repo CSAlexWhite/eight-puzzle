@@ -16,29 +16,32 @@ public class Main {
 	static final String HARD = 	"281463075";
 	static final String WORST = "567408321";
 	
+	static final String[] MOVES = new String[]
+		{ "", "right", "down", "left", "up" };
+	
 	static final int[][] ADJACENCE = new int[][]{
 			
-		  { 0, 1, 0, 1, 0, 0, 0, 0, 0 },
-		  { 1, 0, 1, 0, 1, 0, 0, 0, 0 },
-		  { 0, 1, 0, 0, 0, 1, 0, 0, 0 },
-		  { 1, 0, 0, 0, 1, 0, 1, 0, 0 },
-		  { 0, 1, 0, 1, 0, 1, 0, 1, 0 },
-		  { 0, 0, 1, 0, 1, 0, 0, 0, 1 },
-		  { 0, 0, 0, 1, 0, 0, 0, 1, 0 },
-		  { 0, 0, 0, 0, 1, 0, 1, 0, 1 },
-		  { 0, 0, 0, 0, 0, 1, 0, 1, 0 }};
-	
+		{ 0, 1, 0, 2, 0, 0, 0, 0, 0 },
+		{ 3, 0, 1, 0, 2, 0, 0, 0, 0 },
+		{ 0, 3, 0, 0, 0, 2, 0, 0, 0 },
+		{ 4, 0, 0, 0, 1, 0, 2, 0, 0 },
+		{ 0, 4, 0, 3, 0, 1, 0, 2, 0 },
+		{ 0, 0, 4, 0, 3, 0, 0, 0, 2 },
+		{ 0, 0, 0, 4, 0, 0, 0, 1, 0 },
+		{ 0, 0, 0, 0, 4, 0, 3, 0, 1 },
+		{ 0, 0, 0, 0, 0, 4, 0, 3, 0 }};
+		
 	static final int[][] STEPS_AWAY = new int[][]{
 		
-		  { 0, 1, 2, 1, 2, 3, 2, 3, 4 },
-		  { 1, 0, 1, 2, 1, 2, 3, 2, 3 },
-		  { 2, 1, 0, 3, 2, 1, 4, 3, 2 },
-		  { 1, 2, 3, 0, 1, 2, 1, 2, 3 },
-		  { 2, 1, 2, 1, 0, 1, 2, 1, 2 },
-		  { 3, 2, 1, 2, 1, 0, 1, 2, 1 },
-		  { 2, 3, 4, 1, 2, 1, 0, 1, 2 },
-		  { 3, 2, 3, 2, 1, 2, 1, 0, 1 },
-		  { 4, 3, 2, 3, 2, 1, 2, 1, 0 }};
+		{ 0, 1, 2, 1, 2, 3, 2, 3, 4 },
+		{ 1, 0, 1, 2, 1, 2, 3, 2, 3 },
+		{ 2, 1, 0, 3, 2, 1, 4, 3, 2 },
+		{ 1, 2, 3, 0, 1, 2, 1, 2, 3 },
+		{ 2, 1, 2, 1, 0, 1, 2, 1, 2 },
+		{ 3, 2, 1, 2, 1, 0, 1, 2, 1 },
+		{ 2, 3, 4, 1, 2, 1, 0, 1, 2 },
+		{ 3, 2, 3, 2, 1, 2, 1, 0, 1 },
+		{ 4, 3, 2, 3, 2, 1, 2, 1, 0 }};
 	
 	static State goalState = new State(GOAL);
 	
@@ -99,7 +102,7 @@ public class Main {
 				success = true; 
 				System.out.println("SUCCESS!!");
 				
-				printMoves(current, true); break;	
+				current.printMoves(); break;	
 			}
 										
 			closedList.put(current.key, current);
@@ -138,7 +141,7 @@ public class Main {
 	
 	public static void/*long*/ dF_BnB(long startTime){
 	
-		Vector<State> optimalSolution = new Vector<State>(0);
+		State optimalSolution = null;
 		long optimalTime = 0;
 		openList = new PriorityQueue<State>(10, manhattan);
 		closedList = new Hashtable<String, State>();
@@ -160,7 +163,7 @@ public class Main {
 				tempScore = current.cost;
 				if(tempScore < bestScore) bestScore = tempScore;
 				System.out.println("Solution Time: " + (endTime - startTime) + "ms\tMoves: " + current.cost);
-				optimalSolution = printMoves(current, false); 
+				optimalSolution = current; 
 				optimalTime = endTime - startTime;//break;
 			}
 			
@@ -182,8 +185,7 @@ public class Main {
 		}
 		
 		System.out.println("Optimal Time: " + (optimalTime) + "ms");
-		for(int i=optimalSolution.size()-1; i>=0; i--)
-				optimalSolution.elementAt(i).print();	
+		optimalSolution.printMoves();	
 	}
 	
 	public static void idA_Star(){
@@ -203,7 +205,7 @@ public class Main {
 			if(current.equals(goalState)){ 
 				
 				System.out.println("SUCCESS!!");				
-				printMoves(current, true); break;	
+				current.printMoves(); break;	
 			}
 		
 			// BRANCH AND BOUND
@@ -228,23 +230,6 @@ public class Main {
 		stateList = new Vector<State>(0);
 		misplaced = new MisplacedComparator();
 		manhattan = new ManhattanComparator();	
-	}
-	
-	public static Vector<State> printMoves(State current, boolean print){
-		
-		stateList.add(current);
-		while(current.parent != null){
-			
-			current = current.parent;
-			stateList.add(current);		
-		}
-		
-		if(print){
-			for(int i=stateList.size()-1; i>=0; i--)
-				stateList.elementAt(i).print();	
-		}
-		
-		return stateList;
 	}
 	
 	public static void printTime(){
