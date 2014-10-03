@@ -3,23 +3,20 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.PriorityQueue;
-import java.util.Vector;
 
 public abstract class AStar {
 
 	static PriorityQueue<State> openList;
 	static Hashtable <String, State> closedList;
 	static Hashtable <String, State> openTable;
-	static Vector<State> stateList;
 	
 	public static void run(State start, State goal, Comparator<State> heuristic) { 
 		
-		openList = new PriorityQueue<State>(10, heuristic);
-		openList.add(start);
-		
+		openList = new PriorityQueue<State>(10, heuristic);			
 		closedList = new Hashtable<String, State>();
 		openTable = new Hashtable<String, State>();
-			
+		
+		openList.add(start);
 		State current = null, neighbor = null;
 		
 		int expanded = 0;
@@ -42,15 +39,14 @@ public abstract class AStar {
 				current.printMoves(); break;	
 			}
 										
-			closedList.put(current.key, current);
-			expanded++;
+			closedList.put(current.key, current); expanded++;
 			for(int move=0; move<current.availableMoves; move++){
 				
 				neighbor = new State(current, current.moveableCoords[move]);
 				
 				if(closedList.containsKey(neighbor.key) 
 						&& neighbor.cost < closedList.get(neighbor.key).cost){		// IF WE'VE ALREADY SEEN THIS STATE
-																									// AND IT'S PATH IS COSTLIER THAN THAT
+																					// AND IT'S PATH IS COSTLIER THAN THAT
 					openList.add(neighbor);	
 					openTable.put(neighbor.key, neighbor);
 														// OF THE CURRENT NODE, OPEN UP THE NEIGHBOR
@@ -73,6 +69,12 @@ public abstract class AStar {
 				}
 			}			
 		}		
+	}
+	
+	public static void addToOpen(State toAdd){
+		
+		openList.add(toAdd);	
+		openTable.put(toAdd.key, toAdd);
 	}
 	
 	public static void printTime(){

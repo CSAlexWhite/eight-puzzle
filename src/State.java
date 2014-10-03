@@ -33,14 +33,14 @@ public class State{
 	 */
 	public State(String startString, boolean isGoal){
 		
-		parent = null;					// INITIALIZE THE IMPORTANT REFERENCES
-		goal = Main.goalState;			//
-		adjacence = Main.ADJACENCE;		//
-		stepsAway = Main.STEPS_AWAY;	//
-		moves = Main.MOVES;				//
+		parent = null;			// INITIALIZE THE IMPORTANT REFERENCES
+		goal = Main.goalState;			
+		adjacence = Main.globals.ADJACENCE;		
+		stepsAway = Main.globals.STEPS_AWAY;	
+		moves = Main.globals.MOVES;				
 			
-		cost = 0;					// COST FOR THE START STATE IS ZERO									
-		board = new int[9];			// INITIALIZE THE BOARD
+		cost = 0;				// COST FOR THE START STATE IS ZERO									
+		board = new int[9];		// INITIALIZE THE BOARD
 		for(int i=0; i<9; i++)
 			board[i] = Character.getNumericValue(startString.charAt(i));
 		
@@ -59,19 +59,19 @@ public class State{
 	 */
 	public State(State last, int toMove){  
 		
-		parent = last;					// INITIALIZE THE IMPORTANT REFERENCES
-		goal = Main.goalState;			//
-		adjacence = Main.ADJACENCE;		//
-		stepsAway = Main.STEPS_AWAY;	//
-		moves = Main.MOVES;				//
+		parent = last;			// INITIALIZE THE IMPORTANT REFERENCES
+		goal = Main.goalState;			
+		adjacence = Main.globals.ADJACENCE;		
+		stepsAway = Main.globals.STEPS_AWAY;	
+		moves = Main.globals.MOVES;				
 			
-		cost = last.cost + 1;			// THIS NODES COST INCREMENTS THE LAST'S
+		cost = last.cost + 1;	// THIS NODES COST INCREMENTS THE LAST'S
 		
-		board = new int[9]; 		// THE BOARD IS INITIALZED FROM THE PARENT
+		board = new int[9]; 	// 1-THE BOARD IS INITIALZED FROM THE PARENT
 		for(int i=0; i<9 ; i++) 
 			board[i] = last.board[i];			
 		empty = last.empty;				
-		move(toMove);				// THEN THE ASSIGNED MOVE IS MADE		
+		move(toMove);			// 2-THEN THE ASSIGNED MOVE IS MADE		
 		
 		initActions();		// EMPTY PIECE IS FOUND, POSSIBLE MOVES ARE ASSIGNED
 		setHeuristics();	// THE HEURISTICS FOR THIS POSITION ARE CALCULATED
@@ -198,16 +198,14 @@ public class State{
 		int count = 0;
 		for(int i=0; i<9; i++){
 			
-			if(board[i] != 0){  // FINDS THE POSITIONS OF EACH NUMBER ON EACH 
-								// THE CURRENT BOARD AND THE GOAL BOARD
-				
-				for(int j=0; j<9; j++) if(board[j] == i) x = j;
-				for(int j=0; j<9; j++) if(goal.board[j] == i) y = j;				
-			}
-			
-			count += stepsAway[x][y];	// RETRIEVES THE DISTANCE FROM THE TABLE	
-		}
-		return count;
+			if(board[i] != 0){  		// FINDS THE POSITIONS OF EACH NUMBER ON
+										// THE CURRENT BOARD AND THE GOAL BOARD				
+				for(int j=0; j<9; j++){ 
+					if(board[j] == i) x = j;
+					if(goal.board[j] == i) y = j;	
+				}			
+			}	count += stepsAway[x][y]; 	// GETS THE DISTANCE FROM THE TABLE	
+		}		return count;
 	}
 	
 	/** If not already assigned, converts the board into a String for hashing */
